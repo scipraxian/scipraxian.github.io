@@ -9,7 +9,7 @@ slug: /brain-regions/central-nervous-system
 
 In your real brain, the [Central Nervous System](./central-nervous-system) is the command center. It's where signals travel *really* fast, jumping from neuron to neuron in lightning-quick chains. When you touch something hot, your [Central Nervous System](./central-nervous-system) doesn't stop to think — it fires a signal down your spinal cord to your hand saying "MOVE NOW," and your hand pulls away before you even realize what happened. It's the fast path. The "just do it" system.
 
-Are-Self's [Central Nervous System](./central-nervous-system) works the same way. It's the execution engine — the part where everything that *actually happens* in the system flows through. Nothing gets done without the [Central Nervous System](./central-nervous-system). It's where work happens.
+Are-Self's CNS (`central_nervous_system/central_nervous_system.py`) works the same way. It's the execution engine — the part where everything that *actually happens* in the system flows through. Nothing gets done without the CNS. It's where work happens.
 
 ## How It Works: Spikes and Pathways
 
@@ -27,11 +27,11 @@ A single spike is a single execution at one neuron. But one execution can have l
 
 - **Axon**: An edge (a connection) between two neurons. Can have branching conditions — "only go this way if X happened."
 
-- **Effector**: The actual thing that gets executed at a neuron. The concrete action. A Celery task. An API call. A reasoning session. The real work.
+- **Effector**: The actual thing that gets executed at a neuron. The concrete action. Effectors have a `distribution_mode` — `LOCAL_SERVER`, `ALL_ONLINE_AGENTS`, `ONE_AVAILABLE_AGENT`, or `SPECIFIC_TARGETS` — which determines where the work runs. Built-in effector types include `BEGIN_PLAY`, `FRONTAL_LOBE`, `LOGIC_GATE`, `LOGIC_RETRY`, `LOGIC_DELAY`, and `DEBUG`.
 
 - **Spike**: One single execution event at a neuron, recorded with timestamps, logs, what was on the blackboard when it ran, and whether it succeeded or failed.
 
-- **Spike Train**: A complete traversal of a pathway — one journey through all the connected neurons. Contains many spikes. Has a status (pending, running, succeeded, failed).
+- **Spike Train**: A complete traversal of a pathway — one journey through all the connected neurons. Contains many spikes. Has a status (pending, running, succeeded, failed). The graph dispatch is driven by `CNS.dispatch_next_wave()`, which follows axon types — `TYPE_FLOW`, `TYPE_SUCCESS`, `TYPE_FAILURE` — to decide which neuron fires next.
 
 - **Blackboard**: A JSON dictionary that lives for the entire spike train. Every neuron can read from it and write to it. This is how dominoes talk to each other without being wired together.
 
@@ -47,7 +47,7 @@ Here's the most important thing about the [Central Nervous System](./central-ner
 
 - **[Temporal Lobe](./temporal-lobe)**: Calls the [Central Nervous System](./central-nervous-system) to fetch a pathway and fire off a spike train for the current shift. Basically says "okay, go run this workflow."
 
-- **[Frontal Lobe](./frontal-lobe)**: One type of effector is "start reasoning." When a neuron's job is set to reasoning, it triggers the [Frontal Lobe](./frontal-lobe) to wake up and think.
+- **[Frontal Lobe](./frontal-lobe)**: One type of effector is `FRONTAL_LOBE` — when a neuron's job is set to reasoning, the `NeuroMuscularJunction` dispatches to `run_frontal_lobe()` and the [Frontal Lobe](./frontal-lobe) wakes up and thinks.
 
 - **[Peripheral Nervous System](./peripheral-nervous-system)**: Spikes are actually Celery tasks (workers that do real work). The [Peripheral Nervous System](./peripheral-nervous-system) orchestrates dispatching them and tracks their lifecycle.
 

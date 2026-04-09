@@ -9,13 +9,13 @@ slug: /brain-regions/synaptic-cleft
 
 Imagine your brain as a city full of buildings (neurons). Buildings need to talk to each other, but they're not touching — there's a tiny gap between them. That gap is called the synaptic cleft, and it's where the real communication happens. One building releases special chemicals called neurotransmitters into that gap. The other building's wall has doors (receptors) that only open when the right chemical shows up. When the right chemical finds the right door, a message gets through.
 
-Are-Self's Synaptic Cleft works exactly like this, except instead of brain buildings talking with chemicals, it's different parts of your AI system talking with **typed signals** called **neurotransmitters**. Every signal means something specific — like Dopamine for "yay, it worked!" or Cortisol for "uh oh, something broke." The frontend (the part you see in your browser) listens for these signals and instantly knows when something important happens, without having to constantly ask "is anything new yet? how about now?"
+Are-Self's Synaptic Cleft (`synaptic_cleft/neurotransmitters.py`) works exactly like this, except instead of brain buildings talking with chemicals, it's different parts of your AI system talking with **typed signals** called **neurotransmitters**. Every signal is a `Neurotransmitter(BaseModel)` with a 4-layer routing matrix: `receptor_class` (which Django Channels group), `dendrite_id` (which frontend cache key), `molecule` (which neurotransmitter subclass), and `activity` (what happened). The frontend listens for these signals and instantly knows when something important happens, without having to constantly ask "is anything new yet? how about now?"
 
 This is built on WebSockets (a special way for computers to stay connected and chat in real-time), so there's **no annoying polling** — no sitting around waiting for updates. Updates come to you the moment they happen.
 
 ## How Real-Time Signals Work
 
-When something big happens inside Are-Self — a task finishes, an error occurs, data gets saved — the part that handles it doesn't yell into the void. It fires a specific neurotransmitter that says exactly what kind of event just happened. React (the framework that builds the frontend) listens for these signals using a hook called `useDendrite`. When a signal arrives, React knows to go grab the latest data.
+When something big happens inside Are-Self — a task finishes, an error occurs, data gets saved — the part that handles it calls `fire_neurotransmitter()` with a typed signal. Each neurotransmitter subclass (Dopamine, Cortisol, etc.) serializes itself via `to_synapse_dict()` and gets broadcast through Django Channels. React listens using `useDendrite(receptorClass, dendriteId)`. When a signal arrives, the hook returns a new ref, which triggers a React effect that refetches data.
 
 Here's an example: The [Frontal Lobe](./frontal-lobe) finishes streaming tokens to you and completes your entire reasoning session. It fires a **Dopamine** signal that says "ReasoningSession with id 123 just succeeded!" The frontend is listening for Dopamine signals on reasoning sessions. It gets the signal, knows to refetch the session data, and suddenly you see the final answer.
 
@@ -38,13 +38,41 @@ Each signal carries a specific meaning. Here's what each one does:
 `useDendrite` is the React hook that lets your frontend listen for signals. You tell it what kind of signal you care about and which specific thing you're interested in. It looks like this:
 
 ```javascript
-const { data: sessionData, isLoading } = useDendrite(
-  'ReasoningSessionTurn',  // I'm listening for turns in reasoning sessions
-  sessionId                // specifically, THIS session
-);
+// frontend/hooks/useDendrite.js
+import { useEffect, useState, useCallback } from 'react';
 
-// When a new turn is recorded, the Synaptic Cleft fires Acetylcholine
-// The hook gets the signal and refetches the latest turn data
+export function useDendrite(entityType, entityId) {
+  const [data, setData] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // Establish WebSocket connection to /ws/dendrites/
+  useEffect(() => {
+    const ws = new WebSocket('ws://localhost:8000/ws/dendrites/');
+    
+    ws.onmessage = (event) => {
+      const signal = JSON.parse(event.data);
+      
+      // Only react to signals we care about
+      if (signal.entity_type === entityType && signal.entity_id === entityId) {
+        // Signal arrived! Refetch the data from the API
+        setIsLoading(true);
+        fetch(`/api/v2/${entityType.toLowerCase()}/${entityId}/`)
+          .then(res => res.json())
+          .then(data => {
+            setData(data);
+            setIsLoading(false);
+          });
+      }
+    };
+    
+    return () => ws.close();
+  }, [entityType, entityId]);
+  
+  return { data, isLoading };
+}
+
+// Usage in a React component:
+// const { data: sessionData, isLoading } = useDendrite('ReasoningSession', sessionId);
 ```
 
 The moment a signal matches what you're listening for, the hook hands back a fresh ref, which triggers a React effect that refetches your data. No manual refresh. No polling loop. Just instant updates.

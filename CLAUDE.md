@@ -314,3 +314,20 @@ read the hypothalamus.md as the style reference. Michael should review all 11 fo
 consistency — the hypothalamus and frontal-lobe docs were written directly with full
 code verification; the other 9 were rewritten from the existing doc content (not the code)
 so may have inherited inaccuracies from the previous agent's guesses.
+
+### Architecture.md Rewrite
+`docs/architecture.md` rewritten with the same kid-friendly tone and full cross-links.
+Changes:
+- Fixed copy-paste duplication in Identity section (lines 74-82 had repeated paragraph)
+- Fixed truncated last line ("prove" → "provenance — linked to the session, turn...")
+- Added Python code blocks to every region description (english + python pattern)
+- Every brain-region mention is now a clickable `[link](./brain-regions/slug)` link
+- Escaped `{{` template variables with HTML entities to avoid MDX JSX parsing crashes
+- Biology-first framing added to region descriptions that were missing it
+- Data Flow Principles section completed and cross-linked
+
+**Design pattern — English + Python:** Michael's directive: "this isn't a storybook, it's
+a user manual." Every concept should be explained in English first, then shown in Python.
+The Tick Cycle section in architecture.md was the original example. Now every region
+description in architecture.md follows this pattern, and all 11 brain-region docs have
+Python code blocks alongside their prose explanations.

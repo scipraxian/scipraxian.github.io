@@ -9,7 +9,7 @@ slug: /brain-regions/hypothalamus
 
 Your real hypothalamus is amazing. It sits deep in your brain and it knows what's available to you — food, water, warmth, rest — and it picks what you need right now based on how you're doing. Hungry? It nudges you toward the kitchen. Overheating? It makes you sweat. It doesn't *do* the eating or the sweating — other parts of the body handle that — but it's the one that knows what's out there and decides what to reach for.
 
-Are-Self's Hypothalamus works the same way, except instead of food and water, it knows about AI models. Hundreds of them — big ones, small ones, fast ones, expensive ones, local ones running on your machine, remote ones running in the cloud. When the [Frontal Lobe](./frontal-lobe) needs to think (which is its whole job), it doesn't pick its own brain. It asks the Hypothalamus: "given who I am, what I need to do, and what's healthy right now, which model should I use?"
+Are-Self's Hypothalamus (`hypothalamus/hypothalamus.py`) works the same way, except instead of food and water, it knows about AI models. Hundreds of them — big ones, small ones, fast ones, expensive ones, local ones running on your machine, remote ones running in the cloud. When the [Frontal Lobe](./frontal-lobe) needs to think (which is its whole job), it doesn't pick its own brain. It asks the Hypothalamus: "given who I am, what I need to do, and what's healthy right now, which model should I use?"
 
 The Hypothalamus looks at three things to answer that question: how well the model *fits* the identity asking (semantic matching), whether the model is *healthy* right now (circuit breaker status), and whether the identity can *afford* it (budget). Then it hands back a recommendation and the [Frontal Lobe](./frontal-lobe) goes to work.
 
@@ -21,11 +21,11 @@ When the [Frontal Lobe](./frontal-lobe) asks for a model, the selection happens 
 
 ### Filtering — Who's Even Eligible?
 
-First, the Hypothalamus builds a pool of candidates by checking every model provider against a set of gates. Think of it like a bouncer at the door — you have to pass every check to get in:
+First, `_build_candidate_queryset()` builds a pool of candidates by checking every model provider against a set of gates. Think of it like a bouncer at the door — you have to pass every check to get in:
 
 **Is it turned on?** If someone manually disabled a provider, it's invisible. Simple as that.
 
-**Is it healthy?** This is the circuit breaker check. If a model failed recently and it's still on cooldown, it gets filtered out completely. More on how that works [below](#when-things-go-wrong--circuit-breakers).
+**Is it healthy?** This is the circuit breaker check — `Q(rate_limit_reset_time__isnull=True) | Q(rate_limit_reset_time__lte=timezone.now())`. If a model failed recently and it's still on cooldown, it gets filtered out completely. More on how that works [below](#when-things-go-wrong--circuit-breakers).
 
 **Can the identity afford it?** If the [IdentityDisc](./identity) has a budget set up, the model's cost per token has to be at or below the ceiling. An identity with a small budget won't even see the expensive cloud models.
 
@@ -37,7 +37,7 @@ Whatever survives all those checks is the candidate pool.
 
 ### Strategy — What's the Game Plan?
 
-Now the Hypothalamus needs to pick *one* from the pool. The `attempt` number tells it where to look:
+Now `_select_best_from_strategy()` needs to pick *one* from the pool. The `attempt` number tells it where to look:
 
 **First try (attempt 0)** — If the identity has a preferred model, and it's in the pool, just use it. No math, no comparison. It's the first choice.
 
@@ -54,7 +54,7 @@ If no strategy is configured at all, the system just does a vector search across
 
 This is the clever part. Every [IdentityDisc](./identity) and every AI model in the catalog has a 768-dimensional embedding vector — basically a mathematical fingerprint of what it's about. The identity's vector captures its personality, its tags, what kinds of tasks it does, its system prompt. The model's vector captures its name, creator, family, size, what it's good at, what it was trained for.
 
-The Hypothalamus compares these fingerprints using cosine distance. The closer the match, the better the fit. Among equally good matches, it picks the cheapest one.
+The Hypothalamus compares these fingerprints using `CosineDistance('vector', disc.vector)`. The closer the match, the better the fit. Among equally good matches, it picks the cheapest one.
 
 If an identity hasn't been embedded yet (no vector), the system falls back to just picking the cheapest available model. It works, but it's not smart. Embedding your identities makes selection way better.
 
@@ -64,7 +64,7 @@ In real life, if you eat something and it makes you sick, your body remembers. Y
 
 That's exactly how Are-Self's circuit breaker works.
 
-When the Synapse Client (the wire between the [Frontal Lobe](./frontal-lobe) and the model provider) tries to call a model and it fails — timeout, server error, rate limit, whatever — it "trips" the circuit breaker on that provider. The provider goes on a timeout. While it's on timeout, the Hypothalamus won't even consider it as a candidate.
+When the Synapse Client (the wire between the [Frontal Lobe](./frontal-lobe) and the model provider) tries to call a model and it fails — timeout, server error, rate limit, whatever — it calls `provider.trip_circuit_breaker()` (`hypothalamus/models.py`). The provider goes on a timeout. While it's on timeout, the Hypothalamus won't even consider it as a candidate.
 
 ### How the Timeout Escalates
 
@@ -97,7 +97,7 @@ That's not the model's fault. It's not broken. You just need to free up some mem
 
 If the system treated this like a regular failure, the circuit breaker would start escalating — 60 seconds, then 2 minutes, then 4 — and by the time you close your browser tabs, the model is benched for 5 minutes even though it's ready to go. That's not fair to the model, and it's annoying for you.
 
-So the system handles resource errors differently. Instead of tripping the circuit breaker, it applies a **resource cooldown**: a flat 60-second pause, every time, no escalation. The failure counter doesn't increment. The backoff doesn't grow. It just waits a minute, tries again, and if memory is still tight, waits another minute.
+So the system handles resource errors differently. Instead of tripping the circuit breaker, it calls `provider.trip_resource_cooldown()` — a flat `RESOURCE_COOLDOWN = timedelta(seconds=60)` pause, every time, no escalation. The `rate_limit_counter` doesn't increment. The backoff doesn't grow. It just waits a minute, tries again, and if memory is still tight, waits another minute.
 
 Here's how they compare side by side:
 
@@ -109,7 +109,7 @@ Here's how they compare side by side:
 | **Effect on future timeouts** | Each failure makes the next one longer | None |
 | **Who's at fault** | The provider | Your machine |
 
-The Synapse Client figures out which one to use by looking at the error message. If it sees phrases like "requires more system memory", "out of memory", or "insufficient memory", it knows this is a resource problem and uses the gentle path.
+The Synapse Client (`frontal_lobe/synapse_client.py`) figures out which one to use by matching the error string against `RESOURCE_ERROR_MARKERS` — if it sees phrases like "requires more system memory", "out of memory", or "insufficient memory", it knows this is a resource problem and uses the gentle path.
 
 ## Scar Tissue — When a Model Proves It Can't Do Something
 

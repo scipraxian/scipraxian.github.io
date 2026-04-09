@@ -13,15 +13,15 @@ Are-Self's Identity region works exactly the same way. It stores templates — t
 
 ## Key Concepts
 
-**Identity Template** — This is the blueprint. It contains the persona's system prompt (the core instructions that tell it how to think), the tools it's allowed to use, and personality metadata (tags, type, name). Templates are immutable — once made, they don't change. If you want a different version, you fork it and make a new one, just like branching off from a tree.
+**Identity Template** (`identity/models.py → Identity`) — This is the blueprint. It contains the `system_prompt_template` (Django template syntax with variables like `&#123;&#123;identity_disc.name&#125;&#125;`), the `enabled_tools` it's allowed to use, and personality metadata (tags, type, name). Templates are immutable — once made, they don't change. If you want a different version, you fork it and make a new one, just like branching off from a tree.
 
-**IdentityDisc** — This is a living, working instance of a template. It has a level (how much it's grown), XP (experience points it's earned), success/failure counters (what worked, what didn't), and a unique vector embedding — a 768-dimensional mathematical fingerprint that captures what the disc is really about. The [Hypothalamus](./hypothalamus) uses this fingerprint to find the perfect AI model for the job.
+**IdentityDisc** (`identity/models.py → IdentityDisc`) — This is a living, working instance of a template. It has a `level` (calculated from `total_xp // 100 + 1`), XP (experience points earned via `turn.apply_efficiency_bonus()` and engram saves), success/failure counters, and a `VectorField(dimensions=768)` embedding — a mathematical fingerprint that captures what the disc is really about. The [Hypothalamus](./hypothalamus) uses this fingerprint to find the perfect AI model for the job.
 
 **Vector Embedding** — Imagine every persona and every AI model in the world described as a point in a huge mathematical space. That description is the embedding. It's auto-generated from the persona's prompt, tags, and type. When the [Hypothalamus](./hypothalamus) needs to pick a model, it looks at embeddings to find the best match — kind of like finding your doppelgänger in a crowd.
 
-**Addons** — These are optional power-ups you can attach to a persona. They inject extra context into the reasoning prompt at specific moments — when the persona is reviewing its history, when it's thinking about what tools to use, or when it's remembering past wins and losses. Think of them like special abilities you can equip.
+**Addons** (`identity/models.py → IdentityAddon`) — These are optional power-ups you can attach to a persona. Each addon has a `function_slug` and an `IdentityAddonPhase` — `IDENTIFY`, `CONTEXT`, `HISTORY`, or `TERMINAL` — that controls *when* during prompt assembly it fires. The Focus Addon (`identity/addons/focus_addon.py`) is one example, injecting focus budget status at the terminal phase. Think of them like special abilities you can equip at specific moments.
 
-**Tool Binding** — Each IdentityDisc knows exactly which tools it can use. It's like a police officer having a badge and a radio, but not a medical kit. The [Parietal Lobe](./parietal-lobe) enforces this — it makes sure discs can only access the tools they're allowed to use.
+**Tool Binding** — Each Identity has `enabled_tools` — a many-to-many link to `ToolDefinition` records. It's like a police officer having a badge and a radio, but not a medical kit. The [Parietal Lobe](./parietal-lobe) enforces this — it makes sure discs can only access the tools they're allowed to use.
 
 ## How It All Fits Together
 

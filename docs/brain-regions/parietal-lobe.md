@@ -17,7 +17,7 @@ Think of it like this: if you're baking cookies and you need to blend something,
 
 Every tool in the system lives as a **Tool Definition** in the database. It's like a blueprint: the tool's name, what it does, what inputs it needs (and what type those inputs should be), and what it returns.
 
-When a tool call comes in, the **ParietalMCP gateway** takes over. It's the bouncer at the door, and it runs three checks:
+When a tool call comes in, the **ParietalMCP gateway** (`parietal_lobe/parietal_mcp/gateway.py → ParietalMCP.execute()`) takes over. It's the bouncer at the door, and it runs three checks:
 
 1. **Does the tool exist?** If the name doesn't match anything in the database, it stops right there.
 2. **Do the parameters have the right shape?** Each parameter has a declared type (text, number, true/false, etc.). The gateway checks that what was passed matches that type.
@@ -25,7 +25,7 @@ When a tool call comes in, the **ParietalMCP gateway** takes over. It's the boun
 
 If anything fails, the gateway sends back an error message explaining what went wrong. The [Frontal Lobe](./frontal-lobe) gets the feedback and can try again with better information.
 
-If everything passes, the gateway calls the Python function that actually does the work. The function gets some automatic help: the `session_id` (which conversation this is) and `turn_id` (which step in the conversation) are injected automatically, so the function always knows the context.
+If everything passes, the gateway dynamically imports `parietal_lobe.parietal_mcp.{tool_name}` and calls it. The hallucination armor filters parameters to only what the function signature accepts — `safe_args = {k: v for k, v in args.items() if k in sig.parameters}` — so even if the LLM hallucinates extra fields, they get silently dropped.
 
 ## Built-in Tools
 

@@ -9,15 +9,15 @@ slug: /brain-regions/frontal-lobe
 
 Your frontal lobe is the part of your brain that *thinks*. Not just quick reactions — that's deeper brain stuff — but the kind of thinking where you sit down, focus, work through a problem step by step, maybe use some tools along the way, and eventually come to a conclusion. It's your ability to hold a thought, build on it, and know when you're done.
 
-Are-Self's Frontal Lobe does exactly that. It runs **Reasoning Sessions** — conversations with an AI model where the system thinks through a problem across multiple rounds. Each round is called a **turn**: the system assembles everything the model needs to know (who it is, what it's working on, what happened so far), sends it to the model, gets a response, and then decides what to do next. Maybe the model wants to use a tool — search the web, read a file, query a database. The Frontal Lobe hands that off to the [Parietal Lobe](./parietal-lobe) (which handles all the hands-on tool work), gets the result back, and loops again.
+Are-Self's Frontal Lobe (`frontal_lobe/frontal_lobe.py`) does exactly that. It runs **Reasoning Sessions** — conversations with an AI model where the system thinks through a problem across multiple rounds. Each round is called a **turn**: the system assembles everything the model needs to know (who it is, what it's working on, what happened so far), sends it to the model, gets a response, and then decides what to do next. The main loop lives in `FrontalLobe.run()` — a `while True` that keeps going until the model is done or focus runs out. Maybe the model wants to use a tool — search the web, read a file, query a database. The Frontal Lobe hands that off to the [Parietal Lobe](./parietal-lobe) via `self.parietal_lobe.process_tool_calls()`, gets the result back, and loops again.
 
 This keeps going — think, act, think, act — until one of two things happens: the model decides it's done and calls `mcp_done`, or it needs to ask a human something and pauses with `mcp_respond_to_user`. That's when the [Thalamus](./thalamus) relay takes over to wait for human input.
 
 ## Focus — You Can't Think Forever
 
-Just like you can't concentrate on homework for 12 hours straight, the Frontal Lobe has a **focus budget**. Every turn costs a little focus. Every tool call costs a little more. When focus runs out, the session has to wrap up — no more turns, time to conclude.
+The Focus Addon (`identity/addons/focus_addon.py`) is an experiment in budgeting a model's context window and turn limits. Every turn costs a little focus. Every tool call costs a little more. When `session.current_focus` hits zero, the session has to wrap up — no more turns, time to conclude. Max focus scales with level: `10 + (level - 1) * 0.5`.
 
-But here's the fun part: focus can come *back*. When the model discovers something genuinely new and saves it to memory (an engram in the [Hippocampus](./hippocampus)), it earns focus back. The system is literally rewarding itself for learning. The more it learns, the longer it can keep thinking. Just like how you can read for hours when a book is interesting, but your attention dies after five minutes on something boring.
+But here's the fun part: focus can come *back*. One way is efficiency — if the previous turn's output was concise, `turn.apply_efficiency_bonus()` awards +1 focus and +5 XP. The other way is learning — when the model discovers something genuinely new and saves it to the [Hippocampus](./hippocampus), `HippocampusMemoryYield.focus_yield` earns focus proportional to how novel the memory was. The system literally rewards itself for thinking tight and learning new things.
 
 ## What a Turn Looks Like
 
@@ -33,13 +33,13 @@ Turns are recorded as `ReasoningTurn` objects and you can browse them in the [Fr
 
 ## Getting a Model — Talking to the Hypothalamus
 
-The Frontal Lobe doesn't pick its own model. Before each turn, it asks the [Hypothalamus](./hypothalamus) to choose one. The [Hypothalamus](./hypothalamus) knows about every available model, their health, their cost, how well they match the identity — and it picks the best fit. The Frontal Lobe just says "I need a brain for this turn" and the [Hypothalamus](./hypothalamus) hands one over.
+The Frontal Lobe doesn't pick its own model. Before each turn, it creates an `AIModelProviderUsageRecord` (the FinOps ledger) and calls `Hypothalamus().pick_optimal_model(pending_ledger, attempt=attempt)`. The [Hypothalamus](./hypothalamus) knows about every available model, their health, their cost, how well they match the identity — and it stamps the ledger with a recommendation. The Frontal Lobe just says "I need a brain for this turn" and the [Hypothalamus](./hypothalamus) hands one over.
 
-The selected model gets wired up through the **Synapse Client**, which is the Frontal Lobe's actual connection to the AI provider. The Synapse Client wraps the call to `litellm.completion()`, sends the request, and either gets a response back or catches an error.
+The selected model gets wired up through `SynapseClient(pending_ledger)` (`frontal_lobe/synapse_client.py`), which is the Frontal Lobe's actual connection to the AI provider. The Synapse Client wraps `litellm.completion()`, sends the request, and either gets a response back or catches an error.
 
 ## When the Model Fails — Failover
 
-Models fail sometimes. The server might be down, you might be rate-limited, your machine might be out of memory. When that happens, the Frontal Lobe doesn't panic. It has a failover loop with up to 8 attempts.
+Models fail sometimes. The server might be down, you might be rate-limited, your machine might be out of memory. When that happens, the Frontal Lobe doesn't panic. It has a failover loop with up to `MAX_FAILOVERS = 8` attempts.
 
 Here's how it works: the first attempt uses attempt number 0, which means the [Hypothalamus](./hypothalamus) tries the preferred model. If that fails, the Synapse Client figures out *what kind* of failure it was and responds appropriately:
 
@@ -51,7 +51,7 @@ Here's how it works: the first attempt uses attempt number 0, which means the [H
 
 After any of these, the Frontal Lobe bumps the attempt counter and asks the [Hypothalamus](./hypothalamus) for the next candidate. The [Hypothalamus](./hypothalamus) walks down the identity's failover strategy — try the same family, try a local backup, do an open search — until either something works or all 8 attempts are used up.
 
-If all 8 fail, the session status gets set to `MAXED_OUT` and the turn is marked `ERROR`. At that point, something is seriously wrong and it needs human attention.
+If all 8 fail, the session gets `ReasoningStatusID.MAXED_OUT` and the turn is marked `ERROR`. At that point, something is seriously wrong and it needs human attention.
 
 ## The Reasoning Loop — Putting It All Together
 
