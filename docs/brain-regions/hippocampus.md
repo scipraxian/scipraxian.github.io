@@ -7,23 +7,27 @@ slug: /brain-regions/hippocampus
 
 # Hippocampus — Memory
 
-## What It Does
+Your real hippocampus is wild. It's this tiny seahorse-shaped part of your brain tucked way down deep, and it's basically your personal librarian. Every time you learn something important — how to ride a bike, that your best friend is scared of spiders, the capital of France — your hippocampus takes that moment and *consolidates* it. It turns the shaky, fuzzy short-term memory into something permanent and solid that your brain can file away and find later.
 
-The Hippocampus is long-term memory. It stores **Engrams**—vector-embedded snapshots of important facts, conclusions, or learned knowledge. Each engram has a name (a unique hash), a description (the actual fact), tags for categorization, a relevance score, and a 768-dimensional vector embedding. When the Frontal Lobe needs context, it queries the Hippocampus by similarity: "What do I know about this topic?" The Hippocampus searches engrams by vector cosine similarity and returns relevant memories to inject into the next session's prompt.
+Are-Self's Hippocampus does exactly the same thing. Every time the [Frontal Lobe](./frontal-lobe) learns something important during a conversation — a fact, an insight, a conclusion about what the user cares about — it hands that to the Hippocampus and says "remember this." The Hippocampus takes it, turns it into a permanent record called an **Engram**, and stores it so future versions of the [Frontal Lobe](./frontal-lobe) can find and use it.
 
-Engrams are deduplicated automatically. If you try to save an engram ≥90% similar to an existing one, the save is rejected with a pointer to the duplicate. This prevents the LLM from endlessly re-learning the same facts.
+## How It Actually Works
 
-## Biological Analogy
+When you save an engram, here's what happens. The engram gets a unique fingerprint (we call it a hash), a description of the actual knowledge, labels called tags to help organize it, and a **768-dimensional embedding vector**. That vector is like a mathematical fingerprint of what the engram is "about" — it captures the meaning in a way that computers can compare to other engrams.
 
-In the brain, the hippocampus is critical for **episodic memory formation and consolidation**. It's where short-term experiences become long-term memories. Are-Self's Hippocampus mirrors this: engrams are the consolidation of what the Frontal Lobe learns into permanent, searchable knowledge. Just as the brain deduplicates similar memories (you don't remember every lunch separately, just "I eat lunch"), the Hippocampus rejects duplicate engrams. And just as memories have context (when, where, why), engrams carry full provenance: which session, which turn, which spike.
+Later, when the [Frontal Lobe](./frontal-lobe) needs context — maybe it wants to know "what do we know about this person's job?" — it asks the Hippocampus to search. The search doesn't look for exact word matches. Instead, it uses the embedding vectors to find engrams that are *semantically similar*. The Hippocampus compares the meaning of the question against the meaning of all the engrams it has stored, picks the best matches, and hands them back to inject into the [Frontal Lobe](./frontal-lobe)'s next prompt.
+
+Just like your real hippocampus, the Hippocampus automatically deduplicates. If you try to save an engram that's 90% or more similar to one that already exists, the save gets rejected. The system points you to the duplicate that's already there. This stops the [Frontal Lobe](./frontal-lobe) from endlessly re-learning the same fact over and over.
+
+Every engram also carries a **provenance chain** — a complete audit trail of where it came from. Which session created it? Which turn? Which spike of computation? Which [IdentityDisc](./identity) was in charge? It's all tracked so you can always trace knowledge back to its source.
 
 ## Key Concepts
 
-- **Engram**: A vector-embedded fact with name (hash), description, tags, relevance score, and 768-dim embedding.
-- **Vector Embedding**: Auto-generated from description and tags using nomic-embed-text via Ollama.
-- **Deduplication**: On save, cosine similarity checked against all existing engrams. ≥90% similarity = rejected with duplicate pointer.
-- **Provenance Chain**: Every engram links back to the session, turn, spike, and IdentityDisc that created it. Full audit trail.
-- **Relevance Score**: A numeric value (0–1) indicating how important the engram is. Used to rank search results.
+- **Engram**: A permanent memory record with a unique hash (name), a description (what it says), tags (categories), a relevance score (how important it is), and a 768-dimensional embedding vector (its mathematical fingerprint of meaning).
+- **Vector Embedding**: Automatically generated from the engram's description and tags using nomic-embed-text, run through Ollama. It's the semantic fingerprint that makes searching by meaning possible.
+- **Deduplication**: Every time you save an engram, the system checks its vector embedding against all existing engrams using cosine similarity. If a match is 90% or higher, the save is rejected with a pointer to the duplicate. This prevents wasteful re-learning.
+- **Provenance Chain**: Every engram records exactly when and where it came from — the session ID, turn number, spike identifier, and [IdentityDisc](./identity) that created it. Full traceability.
+- **Relevance Score**: A number from 0 to 1 showing how important the engram is. Used to rank search results so the most important stuff comes back first.
 
 ## API Endpoints
 
@@ -31,11 +35,11 @@ In the brain, the hippocampus is critical for **episodic memory formation and co
 
 | Method | Endpoint | Purpose |
 |--------|----------|---------|
-| `GET` | `/api/v2/engrams/` | List engrams (supports ?identity_discs=&#123;id&#125; filter) |
+| `GET` | `/api/v2/engrams/` | List engrams (supports ?identity_discs={id} filter) |
 | `POST` | `/api/v2/engrams/` | Create engram (triggers dedup check) |
-| `GET` | `/api/v2/engrams/&#123;id&#125;/` | Retrieve engram details |
-| `PATCH` | `/api/v2/engrams/&#123;id&#125;/` | Update engram (regenerates embedding) |
-| `DELETE` | `/api/v2/engrams/&#123;id&#125;/` | Delete engram |
+| `GET` | `/api/v2/engrams/{id}/` | Retrieve engram details |
+| `PATCH` | `/api/v2/engrams/{id}/` | Update engram (regenerates embedding) |
+| `DELETE` | `/api/v2/engrams/{id}/` | Delete engram |
 
 ### Engram Tags (Categorization)
 
@@ -43,14 +47,14 @@ In the brain, the hippocampus is critical for **episodic memory formation and co
 |--------|----------|---------|
 | `GET` | `/api/v2/engram_tags/` | List tags |
 | `POST` | `/api/v2/engram_tags/` | Create tag |
-| `GET` | `/api/v2/engram_tags/&#123;id&#125;/` | Retrieve tag |
-| `PATCH` | `/api/v2/engram_tags/&#123;id&#125;/` | Update tag |
-| `DELETE` | `/api/v2/engram_tags/&#123;id&#125;/` | Delete tag |
+| `GET` | `/api/v2/engram_tags/{id}/` | Retrieve tag |
+| `PATCH` | `/api/v2/engram_tags/{id}/` | Update tag |
+| `DELETE` | `/api/v2/engram_tags/{id}/` | Delete tag |
 
 ## How It Connects
 
-- **Frontal Lobe**: Calls Hippocampus.read_engram() during prompt assembly to inject relevant memories. Calls save_engram() when the LLM concludes with a new insight.
-- **Identity**: Engrams are scoped to IdentityDiscs. Each disc has its own long-term memory.
-- **Parietal Lobe**: The `mcp_engram_save`, `mcp_engram_read`, `mcp_engram_search`, and `mcp_engram_update` tools are Parietal Lobe gateway calls to the Hippocampus.
-- **Central Nervous System**: Engram saves and reads are logged as side effects of spike execution.
-- **Hypothalamus**: The IdentityDisc's vector embedding is used for model selec
+- **[Frontal Lobe](./frontal-lobe)**: Calls `read_engram()` during prompt assembly to inject relevant memories from the Hippocampus. Calls `save_engram()` when it concludes with a new insight worth remembering.
+- **[IdentityDisc](./identity)**: Engrams are scoped per identity. Each identity has its own long-term memory, separate from other identities' memories.
+- **[Parietal Lobe](./parietal-lobe)**: The tools `mcp_engram_save`, `mcp_engram_read`, `mcp_engram_search`, and `mcp_engram_update` are gateway calls through the [Parietal Lobe](./parietal-lobe) to reach the Hippocampus.
+- **[Central Nervous System](./central-nervous-system)**: Every engram save and read is logged as a side effect of spike execution, so the full history of memory operations is tracked.
+- **[Hypothalamus](./hypothalamus)**: The [IdentityDisc](./identity)'s vector embedding is used for model selection; the Hippocampus uses the same embedding approach for semantic matching of memories.

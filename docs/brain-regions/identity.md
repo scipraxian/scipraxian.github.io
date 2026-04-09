@@ -7,21 +7,31 @@ slug: /brain-regions/identity
 
 # Identity — Personas
 
-## What It Does
+You are different people in different places. The you at home with your family is a little different than the you at school. The you playing soccer is different from the you doing homework. Your brain keeps a "core you" — your values, your personality, the things that make you *you* — but it also knows how to activate different versions of yourself depending on what you're doing. The [Prefrontal Cortex](./prefrontal-cortex) in the front of your brain is the manager that holds onto that core self, and it makes sure all your different selves are still *you*.
 
-The Identity region is like your company's HR department combined with a costume shop. It stores **templates** for AI personas—system prompts, enabled tools, and personality traits. When you need to actually *use* a persona, the Identity region **forges** it into an **IdentityDisc**, a living, leveled instance that accumulates experience (XP), success/failure records, and memories. One Identity template can spawn dozens of Discs, each learning on their own journey.
-
-## Biological Analogy
-
-In neuroscience, the **prefrontal cortex** maintains your stable sense of self—your values, your voice, your personality. But that self doesn't exist in a vacuum. You're actually *instances* of patterns: you at work, you at home, you in a crisis. The Identity region mirrors this. The **Identity template** is your core self-model. The **IdentityDisc** is an instantiation of that self, activated in a specific context, accumulating specific memories and scars. When you sleep, you consolidate those IdentityDisc memories back into your sense of self.
+Are-Self's Identity region works exactly the same way. It stores templates — think of them like blueprints or recipes — that define what an AI persona is like. But here's the cool part: when you actually *need* to use a persona, the Identity region doesn't just pull out the blueprint. It **forges** it into a living, working copy called an **IdentityDisc**. One blueprint can create dozens of discs, and each disc learns and grows on its own — gaining experience, remembering what worked and what didn't, leveling up like a character in a video game. When you're done, those memories get filed away, and the template stays the same, ready to forge new discs again.
 
 ## Key Concepts
 
-- **Identity Template**: A blueprint containing a Django-templatable system prompt, default tools, and personality metadata. Immutable once created (fork it to modify).
-- **IdentityDisc**: A stateful instance of an Identity with level, XP, success/failure counters, and a vector embedding (768-dim, nomic-embed-text). The actual working agent.
-- **Vector Embedding**: Auto-generated from the disc's prompt, type, and tags. Used by the Hypothalamus for model selection matching.
-- **Addons**: Pluggable context-injection layers that inject text into the reasoning prompt at known phases (HISTORY, TOOLS, MEMORY).
-- **Tool Binding**: Each Identity specifies which tools it has access to, enforced via the ParietalMCP gateway.
+**Identity Template** — This is the blueprint. It contains the persona's system prompt (the core instructions that tell it how to think), the tools it's allowed to use, and personality metadata (tags, type, name). Templates are immutable — once made, they don't change. If you want a different version, you fork it and make a new one, just like branching off from a tree.
+
+**IdentityDisc** — This is a living, working instance of a template. It has a level (how much it's grown), XP (experience points it's earned), success/failure counters (what worked, what didn't), and a unique vector embedding — a 768-dimensional mathematical fingerprint that captures what the disc is really about. The [Hypothalamus](./hypothalamus) uses this fingerprint to find the perfect AI model for the job.
+
+**Vector Embedding** — Imagine every persona and every AI model in the world described as a point in a huge mathematical space. That description is the embedding. It's auto-generated from the persona's prompt, tags, and type. When the [Hypothalamus](./hypothalamus) needs to pick a model, it looks at embeddings to find the best match — kind of like finding your doppelgänger in a crowd.
+
+**Addons** — These are optional power-ups you can attach to a persona. They inject extra context into the reasoning prompt at specific moments — when the persona is reviewing its history, when it's thinking about what tools to use, or when it's remembering past wins and losses. Think of them like special abilities you can equip.
+
+**Tool Binding** — Each IdentityDisc knows exactly which tools it can use. It's like a police officer having a badge and a radio, but not a medical kit. The [Parietal Lobe](./parietal-lobe) enforces this — it makes sure discs can only access the tools they're allowed to use.
+
+## How It All Fits Together
+
+When you create a template, you're making a mold. You set the persona's name, personality, system prompt, and which tools it should have. You might tag it — "customer service", "writer", "teacher" — so the system knows what kind of disc it's creating.
+
+Then when you need to actually *use* that persona, you forge a disc from the template. Each disc is stateful — it keeps track of its own experience, learns from its successes and failures, and levels up. Multiple discs from the same template don't interfere with each other. They're like twins raised in different countries — same blueprint, totally different lives.
+
+The disc's embedding is generated automatically and sent to the [Hypothalamus](./hypothalamus). The Hypothalamus uses it to say: "I see this persona is a thoughtful writer. These writing-focused models are going to be a perfect fit." Smart matching.
+
+Addons are optional flavoring. You might add a memory addon that reminds the persona of past conversations, or a style addon that says "always be super friendly." Addons inject their text at known spots during reasoning, so the [Frontal Lobe](./frontal-lobe) knows exactly where to expect them.
 
 ## API Endpoints
 
@@ -31,9 +41,9 @@ In neuroscience, the **prefrontal cortex** maintains your stable sense of self�
 |--------|----------|---------|
 | `GET` | `/api/v2/identities/` | List all identity templates |
 | `POST` | `/api/v2/identities/` | Create new identity template |
-| `GET` | `/api/v2/identities/&#123;id&#125;/` | Retrieve template details |
-| `PATCH` | `/api/v2/identities/&#123;id&#125;/` | Update template |
-| `DELETE` | `/api/v2/identities/&#123;id&#125;/` | Delete template |
+| `GET` | `/api/v2/identities/{id}/` | Retrieve template details |
+| `PATCH` | `/api/v2/identities/{id}/` | Update template |
+| `DELETE` | `/api/v2/identities/{id}/` | Delete template |
 
 ### Identity Discs (Instances)
 
@@ -41,10 +51,10 @@ In neuroscience, the **prefrontal cortex** maintains your stable sense of self�
 |--------|----------|---------|
 | `GET` | `/api/v2/identity-discs/` | List all discs (stateful instances) |
 | `POST` | `/api/v2/identity-discs/` | Forge new disc from template |
-| `GET` | `/api/v2/identity-discs/&#123;id&#125;/` | Retrieve disc with level, XP, stats |
-| `PATCH` | `/api/v2/identity-discs/&#123;id&#125;/` | Update disc metadata |
-| `DELETE` | `/api/v2/identity-discs/&#123;id&#125;/` | Delete disc |
-| `GET` | `/api/v2/identity-discs/&#123;id&#125;/model-preview/` | Preview current model selection for this disc |
+| `GET` | `/api/v2/identity-discs/{id}/` | Retrieve disc with level, XP, stats |
+| `PATCH` | `/api/v2/identity-discs/{id}/` | Update disc metadata |
+| `DELETE` | `/api/v2/identity-discs/{id}/` | Delete disc |
+| `GET` | `/api/v2/identity-discs/{id}/model-preview/` | Preview current model selection for this disc |
 
 ### Addons & Extensions
 
@@ -52,9 +62,9 @@ In neuroscience, the **prefrontal cortex** maintains your stable sense of self�
 |--------|----------|---------|
 | `GET` | `/api/v2/identity_addons/` | List available addons |
 | `POST` | `/api/v2/identity_addons/` | Create addon |
-| `GET` | `/api/v2/identity_addons/&#123;id&#125;/` | Retrieve addon |
-| `PATCH` | `/api/v2/identity_addons/&#123;id&#125;/` | Update addon |
-| `DELETE` | `/api/v2/identity_addons/&#123;id&#125;/` | Delete addon |
+| `GET` | `/api/v2/identity_addons/{id}/` | Retrieve addon |
+| `PATCH` | `/api/v2/identity_addons/{id}/` | Update addon |
+| `DELETE` | `/api/v2/identity_addons/{id}/` | Delete addon |
 
 ### Tags & Types
 
@@ -71,11 +81,13 @@ In neuroscience, the **prefrontal cortex** maintains your stable sense of self�
 |--------|----------|---------|
 | `GET` | `/api/v2/identity-budgets/` | List token/cost budgets |
 | `POST` | `/api/v2/identity-budgets/` | Create budget constraint |
-| `PATCH` | `/api/v2/identity-budgets/&#123;id&#125;/` | Update budget |
+| `PATCH` | `/api/v2/identity-budgets/{id}/` | Update budget |
 
 ## How It Connects
 
-- **Hypothalamus**: Requests the IdentityDisc's vector embedding to match against model embeddings for intelligent routing.
-- **Frontal Lobe**: Loads the IdentityDisc's system prompt and addons during reasoning session setup.
-- **Parietal Lobe**: Respects the IdentityDisc's tool binding—only tools linked to the disc are available.
-- **Temporal Lobe**: Assigns IdentityDiscs to specific shift columns during iteration design.
+- **[Hypothalamus](./hypothalamus)** — Requests the IdentityDisc's vector embedding to match against model embeddings for intelligent routing. Uses the disc's personality fingerprint to find the perfect model for the job.
+- **[Frontal Lobe](./frontal-lobe)** — Loads the IdentityDisc's system prompt and addons when it starts thinking. Asks "who am I?" and the Identity region answers with the full persona.
+- **[Parietal Lobe](./parietal-lobe)** — Respects the IdentityDisc's tool binding — only tools linked to the disc are available for use. Acts as the bouncer.
+- **[Temporal Lobe](./temporal-lobe)** — Assigns IdentityDiscs to specific shift columns during iteration design. Keeps track of which persona is working when.
+- **[Central Nervous System](./central-nervous-system)** — Discs exist within spike execution and messaging. Signals flow through them.
+- **[Synaptic Cleft](./synaptic-cleft)** — Discs report their state and signals here so the system knows what each persona is doing.

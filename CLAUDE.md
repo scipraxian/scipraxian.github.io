@@ -278,3 +278,39 @@ end-to-end pipeline demo. Videos being assembled in kdenlive.
 ### Social Media Accounts Created
 All accounts live under the `scipraxian` handle. See MEDIA_PLAN.md in are-self-documents
 for full account list, media strategy, and content plan.
+
+## Session 5 Changes (April 9, 2026)
+
+### Brain Region Docs Rewrite — Kid-Friendly Tone
+The brain-region docs were written by a previous agent in a dry, textbook style. Michael's
+directive: write for a 10-year-old who's never heard of a hypothalamus. The biological
+analogy should be the entry point, woven naturally into the explanation, not a separate
+"Biological Analogy" section. Technical accuracy stays, but the framing meets a curious kid.
+
+**All 11 brain-region docs rewritten:** hypothalamus, frontal-lobe, central-nervous-system,
+hippocampus, identity, parietal-lobe, peripheral-nervous-system, prefrontal-cortex,
+synaptic-cleft, temporal-lobe, thalamus. All cross-references are clickable links.
+Hypothalamus and frontal-lobe were rewritten from the actual codebase with verified
+technical details. Mermaid flowcharts for error classification in hypothalamus.
+
+**Style rules discovered in this session:**
+- Open with the real-world biology, woven into the Are-Self explanation (not a separate section)
+- Every brain-region mention must be a `[link](./slug)` — no bare text references
+- Explain like you're talking to someone excited and curious, not reading a spec
+- Keep API endpoint tables but push them to the bottom
+- "How It Connects" section at the end with all links
+- Technical details (field names, method names) are fine but introduced through story
+
+### Hypothalamus Circuit Breaker Fix
+Code fix in `are-self-api` prompted the doc rewrite. The Hypothalamus docs now cover
+circuit breaker backoff math, resource cooldown (OOM handling), scar tissue, and the
+Synapse Client error classification flow — all verified against the actual code.
+
+### All Brain Region Docs Complete
+All 11 docs rewritten in same session. The 9 remaining docs (central-nervous-system,
+hippocampus, identity, parietal-lobe, peripheral-nervous-system, prefrontal-cortex,
+synaptic-cleft, temporal-lobe, thalamus) were parallelized across subagents. Each agent
+read the hypothalamus.md as the style reference. Michael should review all 11 for
+consistency — the hypothalamus and frontal-lobe docs were written directly with full
+code verification; the other 9 were rewritten from the existing doc content (not the code)
+so may have inherited inaccuracies from the previous agent's guesses.

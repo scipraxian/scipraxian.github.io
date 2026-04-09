@@ -36,6 +36,26 @@ Last updated: April 6, 2026 (end of session 3).
 - [x] **Corrupted CNS screenshots restored** — 4 files in static/img/ui/ had been overwritten
   with 4789-byte stubs; restored from git HEAD
 
+## In Progress — Brain Region Docs Rewrite
+
+Target: rewrite all brain-region docs from dry textbook style to kid-friendly, biology-first tone.
+Write for a 10-year-old. Biological analogy woven in naturally (not a separate section). Every
+brain-region cross-reference must be a clickable link. Technical accuracy stays — just framed warmly.
+
+- [x] `hypothalamus.md` — Full rewrite. Circuit breaker, resource cooldown, scar tissue, vector
+  matching, budgets, failover strategy. Mermaid error flow diagram. All verified against actual code.
+- [x] `frontal-lobe.md` — Full rewrite. Reasoning loop, focus economy, failover, session statuses,
+  Synapse Client error handling. Cross-linked to Hypothalamus for circuit breaker details.
+- [x] `central-nervous-system.md` — Full rewrite. Pathways, spike trains, neurons, axons, blackboard.
+- [x] `hippocampus.md` — Full rewrite. Engrams, vector dedup, provenance, focus economy tie-in.
+- [x] `identity.md` — Full rewrite. Identities vs IdentityDiscs, addons, tools, tags, vectors.
+- [x] `parietal-lobe.md` — Full rewrite. Tool execution, hallucination armor, MCP gateway.
+- [x] `peripheral-nervous-system.md` — Full rewrite. Celery workers, heartbeats, tick cycle.
+- [x] `prefrontal-cortex.md` — Full rewrite. Epics, stories, tasks, shift scoping.
+- [x] `synaptic-cleft.md` — Full rewrite. WebSocket events, neurotransmitter types, dendrite hook.
+- [x] `temporal-lobe.md` — Full rewrite. Iterations, shifts, temporal scheduling.
+- [x] `thalamus.md` — Full rewrite. Chat relay, standing sessions, human-AI interface.
+
 ## Immediate Priority — Release Day (April 7, 2026)
 
 - [ ] **GitHub Actions workflow for Pages deployment.** Create `.github/workflows/deploy.yml`
