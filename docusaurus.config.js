@@ -8,7 +8,11 @@ const config = {
   favicon: 'img/favicon.ico',
 
   url: 'https://are-self.com',
-  baseUrl: '/',
+  // Docs served under /docs/ on both the public site and locally behind
+  // NGINX (https://local.are-self.com/docs/). This keeps asset URLs
+  // consistent across dev and prod so the NGINX reverse proxy can
+  // forward the path without rewriting.
+  baseUrl: '/docs/',
 
   organizationName: 'scipraxian',
   projectName: 'are-self-docs',

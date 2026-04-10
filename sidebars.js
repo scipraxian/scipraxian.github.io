@@ -47,6 +47,7 @@ const sidebars = {
     },
     'openrouter',
     'api-reference',
+    'mcp-server',
     {
       type: 'category',
       label: 'Security',
