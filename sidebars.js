@@ -80,6 +80,7 @@ const sidebars = {
         'curriculum/admin-guide',
       ],
     },
+    'storybook',
     'faq',
     'contributing',
     'style-guide',
