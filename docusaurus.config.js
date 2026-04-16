@@ -4,7 +4,7 @@ const { themes: prismThemes } = require('prism-react-renderer');
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Are-Self',
-  tagline: 'Autonomous AI reasoning on hardware you already own.',
+  tagline: 'Why do for yourself what Are-Self can do for you?',
   favicon: 'img/favicon.ico',
 
   url: 'https://are-self.com',
@@ -71,6 +71,11 @@ const config = {
             position: 'left',
           },
           {
+            href: '/learn',
+            label: 'Learn',
+            position: 'left',
+          },
+          {
             href: 'https://github.com/scipraxian/are-self-api',
             label: 'GitHub (API)',
             position: 'right',
@@ -108,6 +113,18 @@ const config = {
               {
                 label: 'GitHub (Research)',
                 href: 'https://github.com/scipraxian/are-self-research',
+              },
+            ],
+          },
+          {
+            title: 'Learn',
+            items: [
+              { label: 'All Courses', href: '/learn' },
+              { label: 'Glossary', href: '/learn/glossary' },
+              { label: 'Storybook', to: '/docs/storybook' },
+              {
+                label: 'Scipraxian',
+                href: 'https://scipraxian.org',
               },
             ],
           },

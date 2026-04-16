@@ -13,24 +13,26 @@ function HomepageHeader() {
         <h1 className="hero__title">{siteConfig.title}</h1>
         <p className="hero__subtitle">{siteConfig.tagline}</p>
         <p className={styles.heroDescription}>
-          Free. Local. Private. MIT Licensed.<br />
-          Let small language models work together as a swarm — reasoning
-          autonomously, using tools, forming memories, and managing their own
-          work. On hardware you already own.
+          An open-source, neurologically-inspired AI reasoning swarm
+          engine — bringing free AI to underserved youth, curious
+          adults, and anyone else the subscription economy forgot.
+        </p>
+        <p className={styles.heroTagline}>
+          Free. Local. Private. MIT licensed. On hardware you already own.
         </p>
         <div className={styles.buttons}>
           <Link
             className="button button--secondary button--lg"
-            to="/docs/getting-started"
+            to="/docs/storybook"
           >
-            Get Started
+            Start with the Story
           </Link>
           <Link
             className="button button--outline button--lg"
-            to="/docs/architecture"
+            to="/docs/quick-start"
             style={{ marginLeft: '1rem' }}
           >
-            How It Works
+            For Developers
           </Link>
         </div>
       </div>
@@ -38,46 +40,48 @@ function HomepageHeader() {
   );
 }
 
-const features = [
+// Six doors — one per audience. If you land here and you're not a
+// developer, there is somewhere for you to go.
+const doors = [
   {
-    title: 'Built Like a Brain',
+    title: 'I am a Teacher',
+    link: '/learn',
+    description:
+      'Free, ready-to-run curricula from 4th grade to community college, with worksheets, rubrics, and transcripts for every lesson.',
+  },
+  {
+    title: 'I am a Student',
+    link: '/docs/storybook',
+    description:
+      'Start with Mira and the Are-Self — a free storybook about thinking clearly, asking one more question, and not getting left outside the circle.',
+  },
+  {
+    title: 'I am a Developer',
+    link: '/docs/quick-start',
+    description:
+      'Django 6, Celery, Postgres + pgvector, Ollama. Five-minute install. MIT licensed. Forkable. The architecture is as serious as the vibe is friendly.',
+  },
+  {
+    title: 'I am Curious',
     link: '/docs/architecture',
     description:
-      'Every component maps to a real brain region. The Hippocampus stores memories. The Frontal Lobe reasons. The CNS fires spike trains. This isn\'t a metaphor — it\'s a design principle that makes the system teachable and debuggable.',
+      'Nine brain regions, nine Django apps. The Hippocampus remembers, the Frontal Lobe reasons, the Hypothalamus keeps the bill down. All of it open.',
   },
   {
-    title: 'Runs on Your Hardware',
-    link: '/docs/getting-started',
-    description:
-      'A student with a laptop and curiosity can run an AI reasoning swarm — for free, locally, privately. The models are free via Ollama. The software is MIT licensed. The hardware is whatever you have.',
-  },
-  {
-    title: 'Small Models, Big Work',
+    title: 'I am a Researcher / Journalist',
     link: '/docs/research',
     description:
-      'A 7B parameter model can do real work when the architecture handles the hard parts. The Focus Economy, identity addons, and mechanical structure compensate for small models\' limitations.',
+      'Six working papers on neuro-mimetic architecture, swarm coordination, memory provenance, and local-first AI. Peer review welcome.',
   },
   {
-    title: 'Visual Neural Pathways',
-    link: '/docs/ui/cns-editor',
+    title: 'I am a Corporate Trainer',
+    link: '/learn',
     description:
-      'Build AI workflows as visual graphs — neurons connected by axons, just like a brain. Watch spike trains fire through the network in real time with 3D visualization.',
-  },
-  {
-    title: 'Lifelong Memory',
-    link: '/docs/ui/hippocampus',
-    description:
-      'The Hippocampus stores vector-embedded engrams that persist across sessions. Your AI remembers what it learned yesterday, last week, last year. No more amnesia.',
-  },
-  {
-    title: 'Swarm Ready',
-    link: '/docs/ui/pns',
-    description:
-      'One machine or twenty — the Peripheral Nervous System discovers and coordinates them all. Add hardware, the brain adapts. No reconfiguration needed.',
+      'Honest, vendor-neutral AI literacy and cost-management curricula for teams that actually have to explain their OpenAI bill to the CFO.',
   },
 ];
 
-function Feature({ title, description, link }) {
+function Door({ title, description, link }) {
   return (
     <div className={clsx('col col--4', styles.feature)}>
       <Link to={link} className={styles.featureLink}>
@@ -108,25 +112,116 @@ function HomepageVideo() {
   );
 }
 
+// Twelve Variables — the scipraxian decision lattice. Quiet band,
+// not loud. Links out to scipraxian.org for the full treatment.
+const variables = [
+  'Inclusion',
+  'Humility',
+  'Inquiry',
+  'Fulfillment or Happiness',
+  'Religion or Profit',
+  'Fun',
+  'Fear',
+  'Responsibility',
+  'Perseverance',
+  'Perception',
+  'Time',
+  'Permadeath',
+];
+
+function VariablesStrip() {
+  return (
+    <section className={styles.variablesStrip}>
+      <div className="container">
+        <p className={styles.variablesIntro}>
+          Are-Self is built inside a philosophy called{' '}
+          <a
+            href="https://scipraxian.org"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            scipraxianism
+          </a>
+          . Every meaningful decision weighs against twelve variables,
+          not one.
+        </p>
+        <ul className={styles.variablesList}>
+          {variables.map((v, i) => (
+            <li key={i}>{v}</li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
+// Right-now news. What's shipping, where we'll be, what's worth
+// reading tonight.
+const news = [
+  {
+    tag: 'Just launched',
+    headline: 'are-self-learn',
+    body:
+      'A free curriculum framework — 4th grade through community college — shipping today under MIT. Teachers and parents welcome.',
+    link: '/learn',
+  },
+  {
+    tag: 'On the floor',
+    headline: 'SDCC 2026',
+    body:
+      'Are-Self is at San Diego Comic-Con on the Haunted Space Hotel booth. Come say hi. We will have demos, stickers, and the storybook in print.',
+    link: 'https://hauntedspacehotel.com',
+  },
+  {
+    tag: 'Read tonight',
+    headline: 'Mira and the Are-Self',
+    body:
+      'Book One of the Scipraxian Tales. A story for ten-year-olds and anyone who has ever been ten. Free, online, twenty minutes.',
+    link: '/docs/storybook',
+  },
+];
+
+function NewsStrip() {
+  return (
+    <section className={styles.newsStrip}>
+      <div className="container">
+        <div className="row">
+          {news.map((n, i) => (
+            <div className={clsx('col col--4', styles.newsCol)} key={i}>
+              <Link to={n.link} className={styles.newsCard}>
+                <span className={styles.newsTag}>{n.tag}</span>
+                <h4>{n.headline}</h4>
+                <p>{n.body}</p>
+              </Link>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function Home() {
   const { siteConfig } = useDocusaurusContext();
   return (
     <Layout
       title={siteConfig.title}
-      description="Autonomous AI reasoning on hardware you already own."
+      description="Free, local, MIT-licensed AI reasoning swarm — bringing free AI to underserved youth."
     >
       <HomepageHeader />
       <main>
-        <HomepageVideo />
         <section className={styles.features}>
           <div className="container">
             <div className="row">
-              {features.map((props, idx) => (
-                <Feature key={idx} {...props} />
+              {doors.map((props, idx) => (
+                <Door key={idx} {...props} />
               ))}
             </div>
           </div>
         </section>
+        <HomepageVideo />
+        <NewsStrip />
+        <VariablesStrip />
       </main>
     </Layout>
   );

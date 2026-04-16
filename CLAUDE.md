@@ -12,6 +12,7 @@ Dark-only glassmorphic theme. Deployed at are-self.com. **Public release: April 
 - [are-self-api](https://github.com/scipraxian/are-self-api) — Django 6.x backend (brain regions as Django apps)
 - [are-self-ui](https://github.com/scipraxian/are-self-ui) — React/Vite/TypeScript frontend
 - [are-self-research](https://github.com/scipraxian/are-self-research) — Academic papers (LaTeX, APA 7th edition)
+- [are-self-learn](https://github.com/scipraxian/are-self-learn) — Curriculum layer for kids and the grownups who teach them (launched 2026-04-14)
 
 ## Running Locally
 
@@ -343,3 +344,28 @@ The Tick Cycle in architecture.md is the exception — it uses two full diagram 
 All 11 brain-region docs now have inline code breadcrumbs woven into their prose,
 verified against the actual codebase (method names, file paths, class names, constants).
 No fenced python code blocks remain in any brain-region doc.
+
+## Scipraxianism
+
+Are-Self exists inside a philosophy called **Scipraxianism**, co-developed by
+Michael Clark ("The Scipraxian") and **Andrew Piper** over many years. You do
+not need to master it to work in this repo, but if a design question touches
+*why* something is free, local, or shaped the way it is, the answer usually
+traces back to scipraxianism. The Creed is AI-facing (ten binary-numbered
+assertions at [scipraxian.org](https://scipraxian.org)). The working layer is
+the **Twelve Variables**: Inclusion · Humility · Inquiry · Fulfillment or
+Happiness · Religion or Profit · Fun · Fear · Responsibility · Perseverance ·
+Perception · Time · Permadeath. The first three are the kid-scale compression
+used in the curriculum and the storybook — **do not mistake the three for the
+whole philosophy**.
+
+Are-Self is Michael's solo handiwork (though he bounces everything off Andrew,
+the way they always have). The sister franchise **Haunted Space Hotel** is
+Andrew and Michael jointly — HSH's in-world Factional Omniarchy of Snohe is
+the galactic government that adopted scipraxianism as its official ethical
+framework. HSH lives at [hauntedspacehotel.com](https://hauntedspacehotel.com)
+and is deliberately kept off the scipraxian GitHub profile.
+
+Full Claude-facing briefing:
+`are-self-documents/scipraxian/scipraxian-tldr.md`. Master reference:
+`are-self-documents/scipraxian/scipraxian.md`.

@@ -3,7 +3,28 @@
 Documentation site tasks for the Docusaurus deployment at are-self.com.
 **Release: April 7, 2026.**
 
-Last updated: April 6, 2026 (end of session 3).
+Last updated: April 14, 2026.
+
+> **📘 Curriculum Framework — Planning lives elsewhere.**
+> All curriculum-related planning (the new `are-self-learn` repo, the
+> tag taxonomy, the course template, the frontmatter schema, the
+> NanoBanana diagram, the HS Bio / CC Frameworks / Hypothalamus Cost
+> Management courses, the vocabulary rules, and the frozen agile
+> discussion) lives in:
+> `are-self-documents/CURRICULUM-FRAMEWORK-PLAN.md`
+> That file is the memory layer for the curriculum work. If this docs
+> repo gets a curriculum-adjacent task, cross-reference that doc first.
+
+## Docs-site tasks carried over from the curriculum discussion
+
+- [ ] **Fix blockquote color contrast** — currently unreadable in the
+  dark theme. File: `src/css/custom.css`. WCAG AA target.
+- [x] **Storybook page published** — `docs/storybook.md` created with
+  Chapters 1-7 + Epilogue (author notes appendix stripped). Added to
+  `sidebars.js`. `curriculum/index.md` link updated to point to live
+  `../storybook`.
+- [ ] **Migrate `docs/curriculum/` → new `are-self-learn` repo** once
+  that repo exists. Leave a redirect at the old URL. See planning doc.
 
 ## Completed
 
