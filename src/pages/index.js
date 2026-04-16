@@ -45,7 +45,7 @@ function HomepageHeader() {
 const doors = [
   {
     title: 'I am a Teacher',
-    link: '/learn',
+    link: 'https://github.com/scipraxian/are-self-learn',
     description:
       'Free, ready-to-run curricula from 4th grade to community college, with worksheets, rubrics, and transcripts for every lesson.',
   },
@@ -75,7 +75,7 @@ const doors = [
   },
   {
     title: 'I am a Corporate Trainer',
-    link: '/learn',
+    link: 'https://github.com/scipraxian/are-self-learn',
     description:
       'Honest, vendor-neutral AI literacy and cost-management curricula for teams that actually have to explain their OpenAI bill to the CFO.',
   },
@@ -163,7 +163,7 @@ const news = [
     headline: 'are-self-learn',
     body:
       'A free curriculum framework — 4th grade through community college — shipping today under MIT. Teachers and parents welcome.',
-    link: '/learn',
+    link: 'https://github.com/scipraxian/are-self-learn',
   },
   {
     tag: 'On the floor',
