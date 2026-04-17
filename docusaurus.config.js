@@ -74,9 +74,13 @@ const config = {
             position: 'left',
           },
           {
+            // target forces a full page load so GitHub Pages can serve
+            // the merged-in are-self-learn sub-site instead of the SPA
+            // router treating /learn/ as an internal route and 404'ing.
             href: '/learn/',
             label: 'Learn',
             position: 'left',
+            target: '_self',
           },
           {
             href: 'https://github.com/scipraxian/are-self-api',
@@ -122,8 +126,10 @@ const config = {
           {
             title: 'Learn',
             items: [
-              { label: 'All Courses', href: '/learn/' },
-              { label: 'Glossary', href: '/learn/glossary' },
+              // target: '_self' forces full page navigation to the merged
+              // are-self-learn sub-site (see navbar comment above).
+              { label: 'All Courses', href: '/learn/', target: '_self' },
+              { label: 'Glossary', href: '/learn/glossary', target: '_self' },
               { label: 'Storybook', to: '/docs/storybook' },
               {
                 label: 'GitHub (Learn)',
