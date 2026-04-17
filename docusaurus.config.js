@@ -13,7 +13,10 @@ const config = {
   organizationName: 'scipraxian',
   projectName: 'are-self-docs',
 
-  onBrokenLinks: 'throw',
+  // /learn/* paths resolve to the are-self-learn sub-site, which is built
+  // separately and merged into build/learn/ by .github/workflows/deploy.yml.
+  // Local and CI docs builds can't see those paths, so we warn instead of throw.
+  onBrokenLinks: 'warn',
   onBrokenMarkdownLinks: 'warn',
 
   i18n: {
