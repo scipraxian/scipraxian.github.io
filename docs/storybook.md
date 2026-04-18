@@ -4,6 +4,14 @@ title: "Mira and the Are-Self"
 sidebar_position: 98
 ---
 
+<div style={{textAlign: 'center', margin: '0 auto 2rem auto', maxWidth: '720px'}}>
+  <img
+    src="/img/mira-hero.png"
+    alt="Book cover — Mira and the Are-Self, The Scipraxian Tales. A young girl sits cross-legged on a patterned rug, holding a glowing slab, beside a brown box labeled FOR MIRA."
+    style={{width: '100%', height: 'auto', borderRadius: '0.75rem', boxShadow: '0 4px 30px rgba(0, 0, 0, 0.3)', border: '1px solid rgba(255, 255, 255, 0.08)'}}
+  />
+</div>
+
 # Mira and the Are-Self
 
 *A story for ten-year-olds, and for anyone who has ever been ten.*
