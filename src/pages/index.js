@@ -50,6 +50,15 @@ function HomepageHeader() {
   );
 }
 
+// /learn/* is a separately-built Docusaurus sub-site merged into
+// build/learn/ at deploy time (see .github/workflows/deploy.yml).
+// The docs SPA has no route for it, so <Link to="/learn/..."> gives
+// a client-side 404; only a real navigation reaches GitHub Pages
+// and serves the learn sub-site. Render those as plain anchors.
+function isLearnLink(link) {
+  return typeof link === 'string' && link.startsWith('/learn/');
+}
+
 // Six doors — one per audience. If you land here and you're not a
 // developer, there is somewhere for you to go.
 const doors = [
@@ -92,14 +101,19 @@ const doors = [
 ];
 
 function Door({ title, description, link }) {
+  const inner = (
+    <div className="padding-horiz--md">
+      <h3>{title}</h3>
+      <p>{description}</p>
+    </div>
+  );
   return (
     <div className={clsx('col col--4', styles.feature)}>
-      <Link to={link} className={styles.featureLink}>
-        <div className="padding-horiz--md">
-          <h3>{title}</h3>
-          <p>{description}</p>
-        </div>
-      </Link>
+      {isLearnLink(link) ? (
+        <a href={link} target="_self" className={styles.featureLink}>{inner}</a>
+      ) : (
+        <Link to={link} className={styles.featureLink}>{inner}</Link>
+      )}
     </div>
   );
 }
@@ -196,15 +210,18 @@ function NewsStrip() {
     <section className={styles.newsStrip}>
       <div className="container">
         <div className="row">
-          {news.map((n, i) => (
-            <div className={clsx('col col--4', styles.newsCol)} key={i}>
-              <Link to={n.link} className={styles.newsCard}>
-                <span className={styles.newsTag}>{n.tag}</span>
-                <h4>{n.headline}</h4>
-                <p>{n.body}</p>
-              </Link>
-            </div>
-          ))}
+          {news.map((n, i) => {
+            const inner = (<><span className={styles.newsTag}>{n.tag}</span><h4>{n.headline}</h4><p>{n.body}</p></>);
+            return (
+              <div className={clsx('col col--4', styles.newsCol)} key={i}>
+                {isLearnLink(n.link) ? (
+                  <a href={n.link} target="_self" className={styles.newsCard}>{inner}</a>
+                ) : (
+                  <Link to={n.link} className={styles.newsCard}>{inner}</Link>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>
