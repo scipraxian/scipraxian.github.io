@@ -82,7 +82,7 @@ In parallel, the generic log-merge utilities that used to live in `ue_tools/` ha
 
 ## The Four Fixture Tiers and Where Modifiers Fit
 
-Are-Self's core fixtures load in four biological tiers — `genetic_immutables.json` → `zygote.json` → `initial_phenotypes.json` → `petri_dish.json`. The first three are for everyone (install, Docker, and production); the last is test-only. The neuroplasticity app itself ships only a `reference_data.json` that seeds the five statuses and six event types — it doesn't need zygote or phenotype rows of its own because the registry is empty at first boot. A fresh install has zero installed modifiers; modifiers arrive later, by invitation.
+Are-Self's core fixtures load in four biological tiers — `genetic_immutables.json` → `zygote.json` → `initial_phenotypes.json` → `petri_dish.json`. The first three are for everyone (install, Docker, and production); the last is test-only. The neuroplasticity app follows the same convention: it ships a `genetic_immutables.json` that seeds the five statuses and six event types, and nothing in the other tiers — the registry is empty at first boot. A fresh install has zero installed modifiers; modifiers arrive later, by invitation.
 
 A NeuralModifier bundle's own fixture-like payload — the Effectors, Executables, NeuralPathways it wants to contribute — ships inside the bundle, not as part of the core tiers. The contribution-aware loader (planned) will walk the payload, create each row, and write the matching `NeuralModifierContribution` in the same transaction so the uninstall manifest is always consistent with the install.
 

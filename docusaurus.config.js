@@ -19,6 +19,13 @@ const config = {
   onBrokenLinks: 'warn',
   onBrokenMarkdownLinks: 'warn',
 
+  // Unregister any stale service worker a previous deploy installed at
+  // /sw.js. It was intercepting /learn/ navigations and serving the
+  // docs site's cached /404.html. static/sw.js now contains a
+  // self-unregistering script; this client module handles visitors
+  // whose browser hasn't run the SW update check yet.
+  clientModules: [require.resolve('./src/clientModules/unregisterStaleSW.js')],
+
   i18n: {
     defaultLocale: 'en',
     locales: ['en'],
