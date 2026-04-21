@@ -143,7 +143,7 @@ from `are-self-ui-main` to `are-self-ui` so the launcher can find them.
 Open the `are-self-api` folder and find the file called
 **`are-self-install.bat`**. Double-click it.
 
-A terminal window will open and walk itself through nine steps:
+A terminal window will open and walk itself through ten steps:
 
 1. Creates a Python virtual environment.
 2. Installs the Python packages Are-Self needs.
@@ -156,19 +156,21 @@ A terminal window will open and walk itself through nine steps:
 8. Loads the starter data — the base identities, tools, and neural
    pathways Are-Self ships with.
 9. Creates an admin account with username `admin` and password `admin`.
+10. Runs `npm install` inside the sibling `are-self-ui` folder so the
+    frontend is ready to launch.
 
 When it prints **INSTALLATION COMPLETE**, you're done. Close that window.
 
 :::note Prerequisites the installer assumes
-The installer assumes you have **Python 3.12 or newer** on your PATH. If
-you don't, it will error out in step 1. Install Python from
-[python.org/downloads](https://www.python.org/downloads/) (check the
-"Add Python to PATH" box during install) and re-run the installer.
+The installer assumes you have **Python 3.12 or newer** and **Node.js 18
+or newer** on your PATH. If you don't, it will error out in step 1 (for
+Python) or warn you in step 10 (for Node). Install them from:
 
-The installer does **not** yet run `npm install` in the `are-self-ui`
-folder. Before you launch Are-Self for the first time, open a terminal
-inside `are-self-ui` and run `npm install`. You'll need
-[Node.js 18 or newer](https://nodejs.org/) for that.
+- [python.org/downloads](https://www.python.org/downloads/) — check the
+  "Add Python to PATH" box during install
+- [nodejs.org](https://nodejs.org/) — the LTS build is fine
+
+Then re-run `are-self-install.bat`.
 :::
 
 ## Step 5 — Launch Are-Self
