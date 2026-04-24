@@ -87,11 +87,17 @@ server — all pre-configured so you don't have to set any of them up by hand.
 ### Download and install
 
 Go to [docker.com/products/docker-desktop](https://www.docker.com/products/docker-desktop/)
-and download the installer for your operating system. Double-click it and
-follow the prompts.
+and download the installer for your operating system. On Windows,
+right-click the installer and choose **Run as administrator** so it has
+the permissions it needs. Windows will dim the screen and ask whether you
+want to let the installer make changes to your computer — click **Yes**.
+On macOS or Linux, just double-click the installer. Then follow the
+prompts.
 
 On Windows, Docker may ask to enable WSL 2 (Windows Subsystem for Linux).
-Say yes. It may also ask you to restart your computer. Do that.
+Say yes. It may also ask you to restart your computer. Do that. If you
+hit a security error during install, check the troubleshooting section
+at the bottom of this page.
 
 ### Verify Docker is running
 
@@ -269,6 +275,26 @@ Python isn't installed, or it isn't on your PATH. Install it from
 [python.org/downloads](https://www.python.org/downloads/), make sure to
 check the **"Add Python to PATH"** box during installation, and re-run
 `are-self-install.bat`.
+
+### Docker Desktop install fails with "ProgramData\DockerDesktop must be owned by an elevated account"
+
+This one isn't on you. What this error really means is that an earlier
+Docker install didn't finish cleanly, and the leftover folder on your
+computer is confusing the new installer. The fix is to throw the leftover
+folder away and let the fresh installer start clean.
+
+1. Open File Explorer and go to `C:\ProgramData`. If you don't see a
+   `ProgramData` folder, click the **View** tab at the top and turn on
+   **Hidden items**.
+2. Right-click the `DockerDesktop` folder and choose **Delete**.
+3. If Windows pops up a box asking for administrator permission, click
+   **Continue**.
+4. Now right-click the Docker Desktop installer again and choose **Run
+   as administrator**. Windows will dim the screen and ask whether you
+   want to let it make changes to your computer — click **Yes**.
+
+Once Docker Desktop finishes installing, go back to Step 2 and keep
+going.
 
 ### The installer says "Docker is not running"
 
