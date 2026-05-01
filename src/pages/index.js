@@ -6,6 +6,110 @@ import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
 import styles from './index.module.css';
 
+// Intro hero — dark CNS-graph band, sits above the kid-friendly hero.
+// Engineer / journalist / curious-adult bait; the kid hero stays
+// directly below to keep the page warm. Headline is the audience-naming
+// triple (Variable 1: Inclusion). Tag is partnership-frame, no command
+// verbs. The CNS preview is clickable and routes to the editor walkthrough.
+function IntroHero() {
+  const cnsSrc = useBaseUrl('/img/ui/cns-graph-hero.png');
+  const startDate = new Date('2026-01-02T00:00:00Z');
+  const weeksBuilt = Math.max(
+    1,
+    Math.floor(
+      (Date.now() - startDate.getTime()) / (1000 * 60 * 60 * 24 * 7),
+    ),
+  );
+  return (
+    <section className={styles.introHero}>
+      <div className={clsx(styles.orb, styles.orbTeal)} aria-hidden="true" />
+      <div className={clsx(styles.orb, styles.orbPurple)} aria-hidden="true" />
+      <div className={clsx(styles.orb, styles.orbAmber)} aria-hidden="true" />
+      <div className={clsx(styles.orb, styles.orbIndigo)} aria-hidden="true" />
+      <div className={clsx('container', styles.introContainer)}>
+        <div className={styles.introGrid}>
+          <div className={styles.introCopy}>
+            <p className={styles.introEyebrow}>Open · Local · MIT</p>
+            <h1 className={styles.introHeadline}>
+              Made for{' '}
+              <span className={styles.introAccentTeal}>big tech</span>,{' '}
+              <span className={styles.introAccentPurple}>brave teachers</span>,
+              and <span className={styles.introAccentAmber}>poor kids</span>.
+            </h1>
+            <p className={styles.introTag}>
+              A <strong>powerful</strong>, <strong>private</strong>,{' '}
+              <strong>kid friendly</strong> tool for learning and growing
+              with AIs.
+            </p>
+            <div className={styles.introCtas}>
+              <Link
+                className="button button--primary button--lg"
+                to="/docs/end-to-end"
+              >
+                See it run
+              </Link>
+              <Link
+                className="button button--outline button--lg"
+                to="/docs/quick-start"
+                style={{ marginLeft: '1rem' }}
+              >
+                Quick start
+              </Link>
+            </div>
+            <dl className={styles.introStats}>
+              <div className={styles.introStat}>
+                <dt className={styles.introStatN}>{weeksBuilt}</dt>
+                <dd className={styles.introStatL}>weeks built</dd>
+              </div>
+              <div className={styles.introStat}>
+                <dt className={styles.introStatN}>~57K</dt>
+                <dd className={styles.introStatL}>lines Python</dd>
+              </div>
+              <div className={styles.introStat}>
+                <dt className={styles.introStatN}>~15K</dt>
+                <dd className={styles.introStatL}>lines tests</dd>
+              </div>
+              <div className={styles.introStat}>
+                <dt className={styles.introStatN}>0</dt>
+                <dd className={styles.introStatL}>cloud calls required</dd>
+              </div>
+              <div className={styles.introStat}>
+                <dt className={styles.introStatN}>MIT</dt>
+                <dd className={styles.introStatL}>licensed</dd>
+              </div>
+            </dl>
+          </div>
+          <Link
+            to="/docs/ui/cns-editor"
+            className={styles.introPreviewLink}
+            aria-label="Open the CNS editor walkthrough"
+          >
+            <div className={styles.introPreview}>
+              <div className={styles.introPreviewBar}>
+                <span className={styles.introPreviewPip} />
+                <span className={styles.introPreviewPip} />
+                <span className={styles.introPreviewPip} />
+                <span className={styles.introPreviewTitle}>
+                  are-self / cns / pathway editor
+                </span>
+              </div>
+              <img
+                src={cnsSrc}
+                alt="The Are-Self CNS pathway editor — Begin, List Location, Frontal Lobe, Gate, Retry, and Delay nodes wired together with success and fail edges on a dotted dark canvas."
+                className={styles.introPreviewImg}
+                loading="eager"
+              />
+              <span className={styles.introPreviewCta} aria-hidden="true">
+                Open the editor walkthrough
+              </span>
+            </div>
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function HomepageHeader() {
   const { siteConfig } = useDocusaurusContext();
   const heroSrc = useBaseUrl('/img/hero.png');
@@ -414,6 +518,7 @@ export default function Home() {
       title={siteConfig.title}
       description="Free, local, MIT-licensed AI reasoning swarm — bringing free AI to underserved youth."
     >
+      <IntroHero />
       <HomepageHeader />
       <main>
         <StatePulse />
