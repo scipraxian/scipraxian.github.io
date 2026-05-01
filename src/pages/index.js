@@ -227,7 +227,7 @@ function HomepageVideo() {
       <div className="container">
         <div className={styles.videoWrapper}>
           <iframe
-            src="https://www.youtube.com/embed/UUX-T2aTZlI"
+            src="https://www.youtube.com/embed/fyZcyoWNM4E"
             title="Are-Self — The Grid Is Free"
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
