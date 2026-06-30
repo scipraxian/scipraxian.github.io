@@ -36,7 +36,14 @@ Are-Self stands on top of four programs. Each has its own official installer pag
 - **Ollama** — runs the AI models locally → [ollama.com/download](https://ollama.com/download)
 - **Docker Desktop** — runs the database and supporting services → [docker.com/products/docker-desktop](https://www.docker.com/products/docker-desktop/)
 - **Git for Windows** — downloads Are-Self from GitHub → [git-scm.com/download/win](https://git-scm.com/download/win)
-- **Python** — runs the Are-Self brain → [python.org/downloads/windows](https://www.python.org/downloads/windows/) — **check the "Add Python to PATH" box during install. This one matters.**
+- **Python** — runs the Are-Self brain → [python.org/downloads/windows](https://www.python.org/downloads/windows/) — get **version 3.12 or newer**, and **check the "Add python.exe to PATH" box on the very first installer screen. This one matters more than any other click on this page.**
+
+:::warning The one Python mistake that trips almost everyone
+Two things, both about that little checkbox:
+
+1. **Install Python from [python.org](https://www.python.org/downloads/windows/), not the Microsoft Store.** If you type `python` and Windows pops open the *Store* instead of running anything, you've hit the "App execution alias" — a fake `python` that isn't a real Python. Turn it off: **Settings → Apps → Advanced app settings → App execution aliases**, then switch **OFF** the `python.exe` and `python3.exe` toggles. Then install from python.org.
+2. **That "Add python.exe to PATH" checkbox is at the bottom of the first screen and it's easy to miss.** If you missed it, you don't have to fix anything by hand — just run the python.org installer again, and this time check the box. (The Are-Self installer also prefers the `py` launcher, which dodges this trap, but checking the box is still the surest path.)
+:::
 
 A few small things to expect:
 
@@ -78,7 +85,11 @@ What each line does:
 6. **`cd are-self-api`** — steps into the brain folder.
 7. **`./are-self-install.bat`** — runs the installer script that does the rest.
 
-The installer takes **10 to 30 minutes**. It opens Docker if it isn't running, installs the Python packages Are-Self needs, sets up the database, pulls the embedding model the memory system uses, loads the starter data, and creates an admin login. It tells you what it's doing at every step. When you see **INSTALLATION COMPLETE**, you're done.
+The installer takes **10 to 30 minutes**. It starts by checking that Python, Docker, and Ollama are actually installed — and if one is missing, it stops right away and tells you exactly which one and where to get it, instead of failing halfway through. Then it opens Docker if it isn't running, installs the Python packages Are-Self needs, sets up the database, pulls the two AI models a fresh install needs (the embedding model the memory system uses, and `llama3.2:3b`, the model the chat thinks with), loads the starter data, and creates an admin login. It tells you what it's doing at every step. When you see **INSTALLATION COMPLETE**, you're done.
+
+:::info Pulling `llama3.2:3b` is the big download
+That second model is about **2 GB**, so this is the step that takes the longest on a slow connection. It matters: without it, Are-Self installs and opens fine, but the very first message you send to the chat comes back as an error, because there's no model on your machine for it to think with. The installer pulls it for you so that doesn't happen. (If that one download fails — say your Wi-Fi dropped — the installer finishes anyway and tells you to run `ollama pull llama3.2:3b` yourself later. Everything else still works.)
+:::
 
 ## Step 4 — Launch Are-Self
 
@@ -111,6 +122,7 @@ docker compose up -d
 docker exec -i are_self_db psql -U postgres -d postgres -c "CREATE EXTENSION IF NOT EXISTS vector;"
 python manage.py migrate
 ollama pull nomic-embed-text
+ollama pull llama3.2:3b   # the model the chat reasons with — skip this and the first chat message errors out
 python manage.py loaddata genetic_immutables.json zygote.json initial_phenotypes.json
 DJANGO_SUPERUSER_USERNAME=admin DJANGO_SUPERUSER_EMAIL=admin@are-self.com DJANGO_SUPERUSER_PASSWORD=admin python manage.py createsuperuser --noinput
 cd ../are-self-ui
@@ -144,9 +156,14 @@ Then open [http://localhost:5173](http://localhost:5173).
 
 The program installed fine, but the PowerShell window you have open was started **before** the install finished. PowerShell only checks for new programs when it opens. Close that window and open a new one — Windows key, type `powershell`, Enter.
 
-### The installer says "Python is not recognized"
+### The installer says "Python was not found" (or typing `python` opens the Microsoft Store)
 
-Python isn't installed, or it isn't on your PATH. Reinstall it from [python.org/downloads/windows](https://www.python.org/downloads/windows/), and **make sure to check the "Add Python to PATH" box** on the first screen of the installer. Then close and reopen PowerShell, and run `./are-self-install.bat` again.
+This is the single most common install snag, and it's one of two things:
+
+- **Python isn't on your PATH.** Reinstall from [python.org/downloads/windows](https://www.python.org/downloads/windows/) and **check the "Add python.exe to PATH" box** on the first screen. Then close and reopen PowerShell and run `./are-self-install.bat` again.
+- **Windows is hijacking `python` with a Store stub.** If typing `python` opens the Microsoft Store instead of running anything, that's a fake `python` Windows ships. Turn it off: **Settings → Apps → Advanced app settings → App execution aliases**, switch **OFF** the `python.exe` and `python3.exe` toggles, then install real Python from python.org as above.
+
+A quick way to tell which Python you actually have: in a fresh PowerShell window, type `py -3 --version`. If it prints something like `Python 3.12.x` or newer, you're good — the installer will use that automatically. If it errors, install from python.org and check the PATH box.
 
 ### Docker Desktop install fails with "ProgramData\DockerDesktop must be owned by an elevated account"
 
@@ -163,9 +180,23 @@ Once Docker Desktop finishes installing, restart your computer and resume from S
 
 Launch **Docker Desktop** from your Start menu and wait until the whale icon in your system tray is steady (not animating). Then re-run `./are-self-install.bat`.
 
-### The installer hangs on "Waiting for Ollama daemon"
+### The installer is stuck on "Waiting for Ollama daemon" (or "Waiting for Docker Engine")
 
-Ollama may not have started yet. Look for the llama icon in your system tray. If it's missing, launch Ollama from your Start menu. The installer will pick up once Ollama answers.
+Ollama (or Docker) hasn't started yet. Look for the llama icon (or the whale icon, for Docker) in your system tray. If it's missing, launch the app from your Start menu. The installer keeps checking and picks up on its own once the service answers. It no longer waits forever — if a service never comes up, the installer gives up after a few minutes and tells you exactly which one to start, so it can't hang your machine indefinitely.
+
+### The first time I talk to the chat, it gives an error
+
+This is the classic "clean install" gotcha, and it has one cause: the model the chat reasons with — `llama3.2:3b` — isn't on your machine yet. The memory model (`nomic-embed-text`) is enough to boot and open the app, but the *first chat message* reaches for the reasoning model, and if it isn't there you get an error instead of a reply.
+
+The fix is one line. Open a fresh PowerShell window and run:
+
+```
+ollama pull llama3.2:3b
+```
+
+Wait for it to finish (it's about 2 GB), then restart `are-self.bat` and try the chat again. To confirm it's there, run `ollama list` — you should see `llama3.2:3b` in the list alongside `nomic-embed-text`.
+
+(The installer pulls this model for you, so a normal install never hits this. You'd only see it if that one download was interrupted, or if you installed by hand and skipped the `ollama pull llama3.2:3b` step.)
 
 ### The browser opens but shows "Unable to connect"
 

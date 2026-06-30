@@ -18,11 +18,13 @@ an hour, mostly waiting for downloads. When you're done, double-click
 Mac/Linux) and come back here.
 
 You should be able to open [http://localhost:5173](http://localhost:5173)
-and see the 3D brain landing page. You should also have at least one
-reasoning model pulled in Ollama — `llama3.2` from the install page's
-"say hello" step works fine for a first run. The embedding model
-(`nomic-embed-text`) is pulled automatically by the installer; you
-don't interact with it directly.
+and see the 3D brain landing page. You should also have the reasoning
+model pulled in Ollama — `llama3.2:3b`, which the installer pulls for you.
+Run `ollama list` to confirm it's there; if it's missing (an interrupted
+download, or a hand install that skipped it), run `ollama pull llama3.2:3b`
+before you start, or the first reasoning turn will error out. The embedding
+model (`nomic-embed-text`) is pulled automatically too; you don't interact
+with it directly.
 
 ## Step 1: Create an Environment
 
@@ -155,8 +157,9 @@ Here's how to improve:
 - Check that at least one Celery worker is running (`celery -A config worker -l info -E`)
 - Check the PNS page (`/pns`) — you should see worker cards with heartbeats
 
-**Reasoning session starts but fails immediately:**
+**Reasoning session starts but fails immediately (or the chat errors on your first message):**
 
+- **Most common cause:** the reasoning model isn't pulled. Run `ollama list` — you need `llama3.2:3b` there, not just `nomic-embed-text`. If it's missing, run `ollama pull llama3.2:3b` and restart. (The installer pulls it for you; you'd only hit this if that download was interrupted or you installed by hand.)
 - Check that Ollama is running and the model is pulled (`ollama list`)
 - Check the Hypothalamus model catalog — the model needs to be synced
 - Check the spike forensics (`/cns/spike/&#123;id&#125;`) for the actual error
